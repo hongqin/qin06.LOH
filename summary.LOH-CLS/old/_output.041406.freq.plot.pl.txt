@@ -1,0 +1,1516 @@
+101S.030906.txtM1-2.030906.txtM13.lohcls.013106.tabM14.lohcls.013106.tabM28.022006.txtM32.022006.txtM8.030906.txtSGU57.022006.tabYPS128.lohcls.013106.tabYPS163.030906.txtM5.032906.tab101SM1-2M13M14M28M32M8SGU57YPS128YPS163M5$current_file=[101S.030906.txt]
+R --no-save < /tmp/_101S.041406.21.7.58.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "101S.030906.txt";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[M1-2.030906.txt]
+R --no-save < /tmp/_M1-2.041406.21.8.0.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "M1-2.030906.txt";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+$current_file=[M13.lohcls.013106.tab]
+R --no-save < /tmp/_M13.041406.21.8.2.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "M13.lohcls.013106.tab";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[M14.lohcls.013106.tab]
+R --no-save < /tmp/_M14.041406.21.8.4.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "M14.lohcls.013106.tab";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[M28.022006.txt]
+R --no-save < /tmp/_M28.041406.21.8.5.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "M28.022006.txt";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[M32.022006.txt]
+R --no-save < /tmp/_M32.041406.21.8.7.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "M32.022006.txt";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[M8.030906.txt]
+R --no-save < /tmp/_M8.041406.21.8.9.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "M8.030906.txt";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+$current_file=[SGU57.022006.tab]
+R --no-save < /tmp/_SGU57.041406.21.8.11.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "SGU57.022006.tab";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[YPS128.lohcls.013106.tab]
+R --no-save < /tmp/_YPS128.041406.21.8.13.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "YPS128.lohcls.013106.tab";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");
+$current_file=[YPS163.030906.txt]
+R --no-save < /tmp/_YPS163.041406.21.8.15.r
+
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.2.1  (2005-12-20 r36812)
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #for initial analysis of LOH-CLS data
+> 
+> 
+> 
+> rm(list=ls());
+> 
+> 
+> 
+> file = "YPS163.030906.txt";
+> 
+> 
+> 
+> tb = read.table( file, header=T, sep="\t");
+> 
+> 
+> 
+> tb2 = tb;
+> 
+> labels = names( tb );
+> 
+> 
+> 
+> # normalize the data, to tb2
+> 
+>  for( j in 5: 12 ) {tb2[,j] = tb2[,j] * tb2[,2] * tb2[,3]  }
+> 
+> 
+> 
+> # reorganize the data by days, to tb.m
+> 
+>  n = length(tb2$t) / 3
+> 
+>  col.end=9;
+> 
+> 
+> 
+>  tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+> 
+>  names( tb.m ) = labels[ c(1, 5:12) ];
+> 
+>  #tb.sd = tb.m   # standard deviations
+> 
+> 
+> 
+>  for( i in 1:n ) {
++ 
++    tb.m[i,1]  = tb2$t[3*i -2]
++ 
++    #tb.sd[i,1] = tb.m[i, 1]
++ 
++    for( j in 2: 9 ) {
++ 
++      tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++      #tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
++ 
++    }
++ 
++    tb.m$total[i] = sum( tb.m[i, 2:9], na.rm=T );
++ 
++  }
+> 
+> 
+> 
+> # todo: remove NA and zeros from tb.m
+> 
+> 
+> 
+> # output to out1
+> 
+>  columns = c( 2:5, 10); #columns that I will analyze.
+> 
+>  out1 = data.frame( matrix( nrow=n, ncol=(length(columns)+1)) ) 
+> 
+>  tmp.names = names(tb.m);
+> 
+>  names( out1 ) = tmp.names[c(1:5,10)]
+> 
+>  out1 = tb.m[,c(1:5,10)]
+> 
+> 
+> 
+>  #normalize by t=0 cell counts
+> 
+>  for( j in 2:length(out1[1,]) ) { #columns
++ 
++   for( i in length(out1[,1]):1 ) { #row
++ 
++     out1[i,j] = out1[i,j] / out1[1,j];   #normalization by t=0;
++ 
++   }
++ 
++  }
+> 
+> 
+> 
+> ### plot out1 
+> 
+>  postscript( paste( "_", file, "ps", sep=".") );
+> 
+>  #cols=rainbow( length(out1[1,]) );
+> 
+>  cols = c("green","black","red","purple","blue");
+> 
+>  y.max = max( out1[, 2:length(out1[1,])], na.rm=T ) * 2;
+> 
+>  y.min = min( out1[, 2:length(out1[1,])], na.rm=T ) + 1e-4;
+> 
+>  par( yaxp=c(1e-4,20,1));
+> 
+>  plot(out1[,2] ~ out1$t,type='l', log='y', col=cols[1], main=file, ylim=c(y.min, y.max), xlab="t",ylab="Freq");
+> 
+> # plot(out1[,2] ~ out1$t,type='l', col=cols[1], main=file, ylim=c(y.min, y.max));
+> 
+>  for ( i in 3:length( out1[1,] ) ) {
++ 
++    lines( out1[,i] ~ out1$t, col=cols[i-1] );
++ 
++  } 
+> 
+> 
+> 
+>  labels = names( out1 );
+> 
+>  legend( 0, 0.4 , labels[2:length(labels)], col=cols, lty=1);
+> 
+>  dev.off();
+null device 
+          1 
+> 
+> 
+> 
+>  q("no");

@@ -1,0 +1,106 @@
+setwd("C:/data/lab/MengLu/Hong_modifications/LOH-CLS-37C/R-100505-M34-37C")
+
+rm(list=ls());
+
+tb = read.table( "M34met-100505.tab", header=T, sep="\t");
+tb2 = tb;
+labels = names( tb );
+
+
+# normalize the data
+ for( j in 5: 12 ) {
+    tb2[,j] = tb[,j] * tb[,2] * tb[,3]
+ }
+
+
+# reorganize the data by days
+ n = length(tb$t) / 3
+
+ tb.m = data.frame( matrix( nrow=n, ncol=9) )  # mean values
+ names( tb.m ) = labels[ c(1, 5:12) ];
+
+ tb.sd = tb.m   # standard deviations
+
+
+ for( i in 1:n ) {
+   tb.m[i,1]  = tb2$t[3*i -2]
+   tb.sd[i,1] = tb.m[i, 1]
+   for( j in 2: 9 ) {
+     tb.m[i, j] = mean( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
+     tb.sd[i,j] = sd( tb2[ c(3*i-2, 3*i-1, 3*i), j+3] )
+   }
+ }
+
+###I should do some quality check, using tb.sd / tb.m
+ tb.sd[,2]/tb.m[,2]
+
+### viability and mortality
+ out1 = data.frame( matrix( nrow=n) )   # mean values
+ names( out1 ) = c("t");
+ out1$t = tb.m$t
+ out1$s = tb.m[,2] / tb.m[1,2] 
+ 
+ for( i in 2:length(out1$t) ) {
+   delta.time = - tb.m[(i-1),1] + tb.m[i,1];
+   delta.s    = tb.m[ (i-1),2 ] - tb.m[ i, 2 ];
+
+   out1$m[i] = 2 * ( delta.s / ( tb.m[ (i-1),2 ] + tb.m[ i, 2 ])  )* (1 / delta.time) #???
+   #out1$m2[i] =  ( tb.m[ (i-1),2 ] - tb.m[ i, 2 ] ) / tb.m[ (i-1),2 ]  #???
+
+   out1$t.m[i] = ( tb.m[ (i-1),1 ] + tb.m[ i, 1 ] ) / 2
+ }
+
+ out1[10:12,1:4] = NA; # remove the last 3 data points
+
+ plot( out1$s ~ out1$t, type="l", main="viability");
+
+ plot( out1$m ~ out1$t.m, col="blue", main="mortality rate over time");
+
+### p(b) blacks and rate for becoming blacks lh.b)
+ for( i in 1:9 ) {
+   out1$p.b[i] = tb.m[i,3] / tb.m[i,2] 
+ } 
+ 
+ lo = loess( p.b[1:9] ~ t[1:9], out1);
+ out1$p.b.lo = c( predict( lo ), NA,NA,NA)
+
+ # spline = smooth.spline( out1$t, out1$p.b); #does not work
+ # out1$p.b.lo = spline$y;
+
+ plot( p.b ~t, out1, type="l", ylim=c(-0.05,0.1) );
+ lines( out1$t, out1$p.b.lo, col="red" );
+
+ #out1$rate.b = out1$p.b.lo;
+ for( i in 2:9) {
+   delta.t = - tb.m[(i-1),1] + tb.m[i,1];
+   delta.p.normalized = out1$p.b.lo[ i ] - out1$p.b.lo[i -1]/ (1 - out1$p.b.lo[i-1])
+   out1$rate.b[i] = delta.p.normalized / delta.t 
+} 
+
+ plot( out1$rate.b ~ out1$t.m, col="blue");
+
+ m = lm( out1$rate.b ~ out1$m );
+ summary(m);  #very poor correlation between lh.b and m2 ???
+
+### p(1/2 blacks)
+ delta.B0.5 = tb.m$B0.5 / (tb.m$white - tb.m$black)
+ for( i in 2:9) {
+   delta.t = - tb.m[(i-1),1] + tb.m[i,1];
+   out1$rate.B0.5[i] = delta.B0.5[i] / delta.t # ?????
+   out1$rate.B0.5[i] = delta.B0.5[i]       # 1/2 occurence is a direct measure
+} 
+
+ plot( rate.B0.5 ~ t, out1, main="rate for becoming half blacks" );
+
+
+### p(1/4 blacks)
+ out1$lh.B0.25 = tb.m$B0.25 / ( tb.m$white - tb.m$black)
+ plot( lh.B0.25 ~ t, out1, main = "percentage of 1/4 blacks");
+
+ tmp = (tb.m$B0.25 + tb.m$B0.5) / ( tb.m$white - tb.m$black)
+ plot( tmp ~ tb.m$t, main = "percentage of 1/2 and 1/4 blacks"); 
+ #regrowth decrease p(1/2) p(1/4)
+
+### kernel smooth function ???
+
+

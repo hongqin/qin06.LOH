@@ -1,0 +1,18 @@
+This directory contain data and analysis for LOH-CLS project, conducted at U of Rochester.
+
+A general header in XLS and R is: 
+t 	D1	D2	num	white	black	B0.5	B0.25	B0.125	B0.0625	B2	Btiny	B0.75
+, in which,
+ t  = time,
+ D1 = first dilution
+ D2 = second dilution
+ num = plate number
+ white = number of white colonies
+ black = number of black colonies
+ B0.5 = number of half white - half black colonies
+ B0.25 = number of a quater-black colonies
+ B0.125 = number of one eighth-black colonies
+ B0.0625 = number of 1/16 black colonies
+ B2 = number of colonies with at least (>=) two-event blacks, except 3/4 blacks  <---
+ Btiny = number of colonies with tiny blacks
+ B0.75 = number of colonies with 3/4 blacks.                                     <---

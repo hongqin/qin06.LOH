@@ -1,0 +1,106 @@
+042106Fri Risk of becoming full-black
+
+=>1. Model of P(full black) 10:14->12:45  2.5 hrs
+ 042106.logistics.model.Pblack.r
+   logistic model for P(black)
+      P(black) = a / (1 + b exp(- t/ c) )   Eq 1
+
+->11:22 nlme gnls fitting of Eq1 is done. Plot show the fitting is poor for M2-8 data. 
+
+ 11:40, Man, I have to back to smoothing function. The smoothing method is less controversial. 
+
+ 12:41 After staring at the plots for 2 hours, I realized that R(0.5)/P(black) plot is a straightforward
+presentation which I should choose. The peak of this plot show that R0.5 takes off earlier than full-blacks. 
+The occurence of full-balck catchs up late during aging. Both occurences plateau in the end. 
+
+
+=>2.Regression using max.R0.5 / max.P(black), basal.R0.5 / basal.P(black). 
+ This two compaison may be interesting.  
+
+ gedit 042106.get.basal.max.loh.pl &
+
+ 13:28 '_loh.risk.summary.tab' is re-generated.
+
+ ->13:43 merged data in EXCEL. '_LOH.rls.cls.042106.tab'
+
+ tb = read.table( "data.tab", header=T);
+ tb$L0 = tb$R0.5.0 / tb$Pblack.0;
+ tb$Lmax = tb$R0.5.max / tb$Pb.max;
+ attach(tb);
+ summary( lm( Pb.max ~ ARLS + CLS + L0 + Lmax +R0 + G) );
+
+ 13:52 Ha, another significant correlation between maximal P(black) and ARLS
+> summary( lm( Pb.max ~ ARLS))
+
+Call:
+lm(formula = Pb.max ~ ALRS)
+
+Residuals:
+      Min        1Q    Median        3Q       Max
+-0.113293 -0.036609  0.006205  0.011586  0.105776
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept) -0.397663   0.144804  -2.746  0.02262 *
+ALRS         0.016686   0.004595   3.631  0.00548 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.06515 on 9 degrees of freedom
+Multiple R-Squared: 0.5943,     Adjusted R-squared: 0.5492
+F-statistic: 13.18 on 1 and 9 DF,  p-value: 0.005478
+
+>  summary( lm( Pb.max ~ G + R0 ));
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)   0.6728     0.1883   3.573  0.00727 **
+G            -3.3295     1.1670  -2.853  0.02138 *
+R0          -62.5456    25.4678  -2.456  0.03957 *
+
+>  summary( lm( Pb.max ~ G ));
+F-statistic: 1.685 on 1 and 9 DF,  p-value: 0.2265
+
+>  summary( lm( Pb.max ~ R0 ));
+F-statistic: 0.2887 on 1 and 9 DF,  p-value: 0.6041
+
+> summary(  lm( tb$L0 ~ tb$ARLS + log(tb$CLS)) )
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)  0.732801   0.227286   3.224   0.0122 *
+tb$ARLS     -0.011591   0.005977  -1.939   0.0884 .
+log(tb$CLS) -0.120679   0.052008  -2.320   0.0489 *
+---
+Residual standard error: 0.0828 on 8 degrees of freedom
+Multiple R-Squared: 0.4863,     Adjusted R-squared: 0.3579
+F-statistic: 3.787 on 2 and 8 DF,  p-value: 0.06963
+
+ Because Pb.max and R0.5.max are also correlated, we will see ARLS ~ R0.5.max 
+correlation is also signifcant (p=0.05)
+
+ 2:45 done. ~ 3 hrs. 
+
+=>3. 3D plot of 3-variable regression  3->4:23pm
+
+ tb = read.table( "data.tab", header=T);
+ tb$L0 = tb$R0.5.0 / tb$Pblack.0;
+ tb$Lmax = tb$R0.5.max / tb$Pb.max;
+ attach(tb);
+
+ library(scatterplot3d);
+
+ postscript("3D-scatter.042106.ps", width=8,height=8); 
+ s3d <- scatterplot3d( ARLS, CLS, L0, type='h',color="red", pch=16,
+  main="The correlation among ALRS, CLS, and L0", 
+  );
+ my.lm <- lm( tb$L0 ~ tb$ARLS + tb$CLS);
+ s3d$plane3d( my.lm, lty.box="solid");
+ dev.off();
+
+=>4. Meng mentioned that P(full-black) M34 once reached 0.5 in the end. We examined the June 20.05 experiment.
+That M5 live for 400hours, which is likely to be BY4743. So, BY4743 is probably M34, and M34 is M5. Then, the data
+will make sense. We really need to repeat the experiments to make sure that we got everything right.
+
+Break time: 30, 
+
+
+
+

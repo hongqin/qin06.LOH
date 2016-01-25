@@ -1,0 +1,36 @@
+setwd("C:/data/lab/MengLu/Hong_modifications/LOH-CLS/R");
+
+tb = read.table( "0301M34.tab", header=T, sep="\t");
+
+tb$logT  = tb$white #initiation;
+tb$total = tb$white #initiation;
+
+for( i in 1:12 ) {
+ tb[i, 14] = log( sum( tb[i, 5:13] ) * tb[i, 3] * tb[i,4] );
+ tb[i, 15] =      sum( tb[i, 5:13] ) * tb[i, 3] * tb[i,4];
+ 
+}
+
+
+# tt = smooth.spline(tb$t, tb$total );  #this give negative smotth value at the tail
+
+s.logT = smooth.spline(tb$t, tb$logT );
+tb$total.s = exp( s.logT$y )
+tb$total.s[1] = max( tb$total.s );
+
+#mortality rate estimation
+tb$m = tb$t;
+for( i in 1:11) {
+ tb$m[i] = ( tb$total.s[ i ] -  tb$total.s[ i+1 ] ) / (tb$total.s[i]/2 + tb$total.s[i+1]/2)
+}
+tb$m[12]=NA;
+
+plot( tb$m ~ tb$t, xlab="hours", ylab="mortality rate", main="M34 30C water, 3/1/05"); 
+#whoa, m goes up and then down. not gompertz at all. 
+
+
+#likelihood of LOh occurence
+#too bad the LOH number is too low for this estimation. 
+
+#survival analysis?
+
